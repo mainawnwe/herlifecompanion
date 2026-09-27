@@ -1,0 +1,69 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    font-family: 'Noto Sans Myanmar', 'Poppins', system-ui, sans-serif;
+    background: #f8fafc;
+    color: #0f172a;
+    font-size: 14px;
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  input,
+  textarea,
+  select,
+  button {
+    font-family: inherit;
+  }
+  ::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+}
+
+@layer components {
+  .en {
+    font-family: 'Poppins', system-ui, sans-serif;
+  }
+
+  /* Premium dark header — Navy → Blue → Violet */
+  .gradient-header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #4c1d95 100%);
+    position: relative;
+  }
+
+  /* Feature gradients */
+  .gradient-countdown {
+    background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  }
+  .gradient-love {
+    background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%);
+    border: 1.5px dashed #c4b5fd;
+  }
+
+  /* Glass effect */
+  .glass {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  /* Decorative glow */
+  .glow-blue {
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.35) 0%, transparent 70%);
+  }
+  .glow-violet {
+    background: radial-gradient(circle, rgba(124, 58, 237, 0.3) 0%, transparent 70%);
+  }
+}
