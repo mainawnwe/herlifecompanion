@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563EB"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+  </defs>
+  <!-- Full bleed background (no rounded corners) -->
+  <rect width="512" height="512" fill="url(#bgGrad)"/>
+  
+  <!-- Heart centered in safe zone (smaller to avoid crop) -->
+  <path d="M 256 380
+           C 256 380, 130 305, 130 215
+           C 130 170, 162 140, 205 140
+           C 234 140, 252 158, 256 180
+           C 260 158, 278 140, 307 140
+           C 350 140, 382 170, 382 215
+           C 382 305, 256 380, 256 380 Z"
+        fill="#FFFFFF"/>
+</svg>
