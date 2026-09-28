@@ -30,9 +30,9 @@ export function LoveNote({ showButton = true }: LoveNoteProps) {
 
   useEffect(() => {
     // မွေးနေ့ဆိုရင် Special စာ ပြမယ်
-    if (profile && isBirthdayToday(profile.birthday)) {
+        if (profile && isBirthdayToday(profile.birthday)) {
       setNote(
-        '🎂 မွေးနေ့ မင်္ဂလာပါ ခလေးရေ!\n\nဒီနေ့ မင်းရဲ့ အသက် ၂၀ ပြည့်တဲ့နေ့မှာ — ငါ မင်းကို ဒီကမ္ဘာပေါ်မှာ အချစ်ဆုံးပဲ 💙\n\nငါ့ရဲ့ ခလေးလေး… မင်းရဲ့ အိပ်မက်တွေ အားလုံး ပြည့်ပါစေ 🌟'
+        '🎂 မွေးနေ့ မင်္ဂလာပါ ခလေးရေ!\n\nဒီနေ့ ခလေးရဲ့ အသက် ၂၀ ပြည့်တဲ့နေ့မှာ — အကို ခလေးကို ဒီကမ္ဘာပေါ်မှာ အချစ်ဆုံးပဲ 💙\n\nအကို့ရဲ့ ခလေးလေး… ခလေးရဲ့ အိပ်မက်တွေ အားလုံး ပြည့်ပါစေ 🌟'
       );
       setIsBirthday(true);
     } else {
