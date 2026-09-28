@@ -36,22 +36,37 @@ export function ImportantDates() {
         <div className="mb-3">
           {sorted.map((d) => {
             const days = daysBetween(new Date(), nextOccurrence(d.date));
+            const isToday = days === 0;
+            const variant = isToday
+              ? 'violet'
+              : days <= 7
+              ? 'blue'
+              : 'gray';
+
             return (
               <div
                 key={d.id}
-                className="flex items-center gap-3 py-3 border-b border-border last:border-b-0"
+                className="flex items-center gap-3 py-3 border-b border-slate-100 last:border-b-0"
               >
+                <div className="w-11 h-11 rounded-xl bg-primary-50 border border-primary-100 flex flex-col items-center justify-center flex-shrink-0">
+                  <div className="text-[16px] font-bold text-primary en leading-none">
+                    {days}
+                  </div>
+                  <div className="text-[9px] text-primary/70 font-semibold">
+                    DAYS
+                  </div>
+                </div>
                 <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-sm truncate">
+                  <div className="font-semibold text-sm truncate text-ink">
                     {d.title}
                   </div>
                   <div className="text-[11px] text-ink-muted">{d.date}</div>
                 </div>
-                <Badge variant="pink">{days} ရက်</Badge>
+                {isToday && <Badge variant="violet">🎉 ဒီနေ့</Badge>}
                 <button
                   type="button"
                   onClick={() => removeDate(d.id)}
-                  className="text-[#D1A7BD] text-lg bg-transparent border-none cursor-pointer hover:text-red-400"
+                  className="text-slate-300 text-lg bg-transparent border-none cursor-pointer hover:text-red-400 leading-none"
                   aria-label="Delete"
                 >
                   ×
@@ -85,11 +100,7 @@ export function ImportantDates() {
           onChange={(e) => setDate(e.target.value)}
         />
         <div className="flex gap-2 mt-2">
-          <Button
-            variant="ghost"
-            fullWidth
-            onClick={() => setOpen(false)}
-          >
+          <Button variant="ghost" fullWidth onClick={() => setOpen(false)}>
             မလုပ်တော့
           </Button>
           <Button fullWidth onClick={handleAdd}>
