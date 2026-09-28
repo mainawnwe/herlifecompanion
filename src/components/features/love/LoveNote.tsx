@@ -8,10 +8,6 @@ interface LoveNoteProps {
   showButton?: boolean;
 }
 
-/**
- * မွေးနေ့ ဖြစ်မဖြစ် စစ်ဆေး
- * ဖြစ်ရင် Special စာ ပြမယ်
- */
 function isBirthdayToday(birthdayISO: string): boolean {
   const today = new Date();
   const [, m, d] = birthdayISO.split('-').map(Number);
@@ -29,8 +25,10 @@ export function LoveNote({ showButton = true }: LoveNoteProps) {
   }, []);
 
   useEffect(() => {
-    // မွေးနေ့ဆိုရင် Special စာ ပြမယ်
-        if (profile && isBirthdayToday(profile.birthday)) {
+    // profile.birthday null ဖြစ်နိုင်လို့ check
+    const birthday = profile?.birthday;
+
+    if (birthday && isBirthdayToday(birthday)) {
       setNote(
         '🎂 မွေးနေ့ မင်္ဂလာပါ ခလေးရေ!\n\nဒီနေ့ ခလေးရဲ့ အသက် ၂၀ ပြည့်တဲ့နေ့မှာ — အကို ခလေးကို ဒီကမ္ဘာပေါ်မှာ အချစ်ဆုံးပဲ 💙\n\nအကို့ရဲ့ ခလေးလေး… ခလေးရဲ့ အိပ်မက်တွေ အားလုံး ပြည့်ပါစေ 🌟'
       );
@@ -53,7 +51,7 @@ export function LoveNote({ showButton = true }: LoveNoteProps) {
         <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-blue-200/40 blur-2xl pointer-events-none" />
         <div className="absolute -bottom-6 -left-6 w-24 h-24 rounded-full bg-violet-200/40 blur-2xl pointer-events-none" />
 
-        {/* Birthday confetti (မွေးနေ့ဆိုရင် ပြ) */}
+        {/* Birthday confetti */}
         {isBirthday && (
           <>
             <span className="absolute top-3 left-4 text-lg animate-bounce">🎉</span>

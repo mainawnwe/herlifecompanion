@@ -41,21 +41,24 @@ export function BirthdayCountdown() {
     seconds: 0,
   });
 
+  // ⚠️ birthday null ဖြစ်နိုင်လို့ Safe String
+  const birthday = profile?.birthday ?? '';
+
   useEffect(() => {
-    if (!profile) return;
-    const target = nextBirthday(profile.birthday);
+    if (!birthday) return;
+    const target = nextBirthday(birthday);
     const tick = () => setTimeLeft(getTimeLeft(target));
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
-  }, [profile]);
+  }, [birthday]);
 
-  if (!profile) return null;
+  if (!profile || !birthday) return null;
 
-  const next = nextBirthday(profile.birthday);
-  const calendarDays = daysBetween(new Date(), next); // ← Calendar
-  const durationDays = Math.floor(timeLeft.totalHours / 24); // ← Duration
-  const age = getAge(profile.birthday, next);
+  const next = nextBirthday(birthday);
+  const calendarDays = daysBetween(new Date(), next);
+  const durationDays = Math.floor(timeLeft.totalHours / 24);
+  const age = getAge(birthday, next);
   const isToday = calendarDays === 0;
 
   const DAYS_IN_YEAR = 365;
@@ -114,7 +117,7 @@ export function BirthdayCountdown() {
                 {calendarDays === 1 ? 'Day' : 'Days'}
               </div>
               <div className="text-[11px] text-white/55 mt-1">
-                {formatMM(profile.birthday)} အထိ
+                {formatMM(birthday)} အထိ
               </div>
             </div>
 
@@ -163,7 +166,7 @@ export function BirthdayCountdown() {
                   မွေးနေ့
                 </div>
                 <div className="text-[13px] font-semibold text-white/95">
-                  {formatMM(profile.birthday)}
+                  {formatMM(birthday)}
                 </div>
               </div>
               <div className="w-px h-9 bg-white/15" />
