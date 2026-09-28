@@ -3,19 +3,26 @@ import { useProfileStore } from '@/store/profileStore';
 import { nextBirthday, daysBetween, getAge, formatMM } from '@/lib/utils';
 
 interface TimeLeft {
+  totalHours: number;
+  totalMinutes: number;
+  totalSeconds: number;
   hours: number;
   minutes: number;
   seconds: number;
-  totalMs: number;
 }
 
 function getTimeLeft(target: Date): TimeLeft {
   const diff = Math.max(0, target.getTime() - Date.now());
+  const totalHours = Math.floor(diff / 3600000);
+  const totalMinutes = Math.floor(diff / 60000);
+  const totalSeconds = Math.floor(diff / 1000);
   return {
-    hours: Math.floor((diff / 3600000) % 24),
+    totalHours,
+    totalMinutes,
+    totalSeconds,
+    hours: totalHours % 24,
     minutes: Math.floor((diff / 60000) % 60),
     seconds: Math.floor((diff / 1000) % 60),
-    totalMs: diff,
   };
 }
 
@@ -26,20 +33,19 @@ function pad(n: number): string {
 export function BirthdayCountdown() {
   const profile = useProfileStore((s) => s.profile);
   const [timeLeft, setTimeLeft] = useState<TimeLeft>({
+    totalHours: 0,
+    totalMinutes: 0,
+    totalSeconds: 0,
     hours: 0,
     minutes: 0,
     seconds: 0,
-    totalMs: 0,
   });
 
   useEffect(() => {
     if (!profile) return;
-
     const target = nextBirthday(profile.birthday);
-
     const tick = () => setTimeLeft(getTimeLeft(target));
     tick();
-
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, [profile]);
@@ -47,15 +53,15 @@ export function BirthdayCountdown() {
   if (!profile) return null;
 
   const next = nextBirthday(profile.birthday);
-  const totalDays = daysBetween(new Date(), next); // ← Calendar days (မှန်)
+  const calendarDays = daysBetween(new Date(), next); // ← Calendar
+  const durationDays = Math.floor(timeLeft.totalHours / 24); // ← Duration
   const age = getAge(profile.birthday, next);
-  const isToday = totalDays === 0;
+  const isToday = calendarDays === 0;
 
-  // Progress bar: ဒီနှစ်အတွင်း ဘယ်လောက်ရောက်နေပြီလဲ
   const DAYS_IN_YEAR = 365;
   const progressPct = Math.min(
     100,
-    Math.max(0, ((DAYS_IN_YEAR - totalDays) / DAYS_IN_YEAR) * 100)
+    Math.max(0, ((DAYS_IN_YEAR - calendarDays) / DAYS_IN_YEAR) * 100)
   );
 
   return (
@@ -65,10 +71,9 @@ export function BirthdayCountdown() {
       <div className="absolute -bottom-20 -left-16 w-56 h-56 rounded-full bg-fuchsia-400/25 blur-3xl pointer-events-none" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 rounded-full bg-violet-400/15 blur-3xl pointer-events-none" />
 
-      {/* Floating sparkles */}
+      {/* Sparkles */}
       <span className="absolute top-5 right-16 text-xs opacity-70 animate-pulse">✨</span>
       <span className="absolute bottom-8 right-6 text-xs opacity-60 animate-pulse [animation-delay:0.5s]">✨</span>
-      <span className="absolute top-1/3 right-3 text-[10px] opacity-50 animate-pulse [animation-delay:1s]">⭐</span>
 
       <div className="relative z-10">
         {/* Header */}
@@ -86,7 +91,6 @@ export function BirthdayCountdown() {
         </div>
 
         {isToday ? (
-          /* ═══ Birthday Today ═══ */
           <div className="text-center py-4">
             <div className="text-[56px] leading-none mb-3 animate-bounce">🎉</div>
             <div className="text-[22px] font-bold text-white mb-1.5">
@@ -98,26 +102,40 @@ export function BirthdayCountdown() {
           </div>
         ) : (
           <>
-            {/* ═══ Big Days Number ═══ */}
+            {/* ═══ Big Days Number (Calendar) ═══ */}
             <div className="text-center mb-5">
               <div
                 className="text-[88px] font-black en leading-none tracking-tighter tabular-nums"
                 style={{ textShadow: '0 6px 32px rgba(255,255,255,0.4)' }}
               >
-                {pad(totalDays)}
+                {pad(calendarDays)}
               </div>
               <div className="text-[11px] font-bold tracking-[0.35em] text-white/75 uppercase mt-2 en">
-                {totalDays === 1 ? 'Day' : 'Days'}
+                {calendarDays === 1 ? 'Day' : 'Days'}
+              </div>
+              <div className="text-[11px] text-white/55 mt-1">
+                {formatMM(profile.birthday)} အထိ
               </div>
             </div>
 
-            {/* ═══ Live Timer (Prettier) ═══ */}
-            <div className="flex items-center justify-center gap-2 mb-5">
-              <TimeBox value={pad(timeLeft.hours)} label="HRS" />
-              <Colon />
-              <TimeBox value={pad(timeLeft.minutes)} label="MIN" />
-              <Colon />
-              <TimeBox value={pad(timeLeft.seconds)} label="SEC" />
+            {/* ═══ Total Remaining Time (Text) ═══ */}
+            <div className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 px-4 py-3 mb-4">
+              <div className="text-[9px] font-semibold tracking-[0.2em] text-white/60 uppercase text-center mb-1.5 en">
+                Total Remaining
+              </div>
+              <div className="text-center en tabular-nums text-[20px] font-bold text-white">
+                <span className="text-white/90">{timeLeft.totalHours}</span>
+                <span className="text-white/50 text-sm">h</span>
+                <span className="mx-1.5 text-white/40">·</span>
+                <span className="text-white/90">{pad(timeLeft.minutes)}</span>
+                <span className="text-white/50 text-sm">m</span>
+                <span className="mx-1.5 text-white/40">·</span>
+                <span className="text-white/90">{pad(timeLeft.seconds)}</span>
+                <span className="text-white/50 text-sm">s</span>
+              </div>
+              <div className="text-[10px] text-white/50 text-center mt-1">
+                (စုစုပေါင်း ကျန်ချိန် — {durationDays} ရက် {timeLeft.hours} နာရီ)
+              </div>
             </div>
 
             {/* ═══ Progress Bar ═══ */}
@@ -161,32 +179,6 @@ export function BirthdayCountdown() {
           </>
         )}
       </div>
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════
-   Time Box — Hours/Minutes/Seconds
-   ═══════════════════════════════════════ */
-function TimeBox({ value, label }: { value: string; label: string }) {
-  return (
-    <div className="flex flex-col items-center min-w-[64px]">
-      <div className="relative w-full px-3 py-2 rounded-xl bg-white/15 backdrop-blur-md border border-white/25 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.15)]">
-        <div className="text-[22px] font-black en tabular-nums leading-none text-center text-white drop-shadow-[0_2px_8px_rgba(255,255,255,0.35)]">
-          {value}
-        </div>
-      </div>
-      <div className="text-[9px] font-bold tracking-[0.2em] text-white/70 uppercase mt-1.5 en">
-        {label}
-      </div>
-    </div>
-  );
-}
-
-function Colon() {
-  return (
-    <div className="flex flex-col items-center -mt-4">
-      <span className="text-[20px] font-bold text-white/50 leading-none">:</span>
     </div>
   );
 }
