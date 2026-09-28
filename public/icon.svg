@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563EB"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+    <linearGradient id="heartGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#DBEAFE"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Rounded Square Background -->
+  <rect x="0" y="0" width="512" height="512" rx="112" ry="112" fill="url(#bgGrad)"/>
+
+  <!-- Subtle Inner Glow -->
+  <circle cx="150" cy="130" r="180" fill="#FFFFFF" opacity="0.06"/>
+  <circle cx="400" cy="420" r="220" fill="#FFFFFF" opacity="0.04"/>
+
+  <!-- Heart Shape -->
+  <g filter="url(#glow)">
+    <path d="M 256 400
+             C 256 400, 100 310, 100 200
+             C 100 145, 140 110, 190 110
+             C 225 110, 250 130, 256 155
+             C 262 130, 287 110, 322 110
+             C 372 110, 412 145, 412 200
+             C 412 310, 256 400, 256 400 Z"
+          fill="url(#heartGrad)"/>
+  </g>
+
+  <!-- HLC Text -->
+  <text x="256" y="470"
+        font-family="Poppins, -apple-system, sans-serif"
+        font-size="52"
+        font-weight="700"
+        fill="#FFFFFF"
+        text-anchor="middle"
+        letter-spacing="8"
+        opacity="0.95">HLC</text>
+</svg>
