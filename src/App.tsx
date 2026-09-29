@@ -13,6 +13,7 @@ import { JournalPage } from '@/pages/Journal';
 import { HealthPage } from '@/pages/Health';
 import { LovePage } from '@/pages/Love';
 import { MorePage } from '@/pages/More';
+import { useCoupleStore } from '@/store/coupleStore';
 
 export default function App() {
   const { user, initialized, init } = useAuthStore();
@@ -23,11 +24,12 @@ export default function App() {
   }, [init]);
 
   // User login → Profile + Data အားလုံး Load
-  useEffect(() => {
+    useEffect(() => {
     if (!user) return;
 
     (async () => {
       await loadProfile();
+      await useCoupleStore.getState().loadPartner();
       await Promise.all([
         useJournalStore.getState().loadFromCloud(),
         useTodoStore.getState().loadFromCloud(),
