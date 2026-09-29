@@ -139,8 +139,9 @@ export function MorePage() {
               နှစ်ယောက် ချိတ်ဆက်သွားမယ်။
             </p>
 
+            {/* My Code */}
             <div className="flex items-center gap-2 mb-4">
-              <div className="flex-1 bg-gradient-to-br from-blue-50 to-violet-50 rounded-xl px-4 py-3 border border-primary-100 text-center">
+              <div className="flex-1 min-w-0 bg-gradient-to-br from-blue-50 to-violet-50 rounded-xl px-4 py-3 border border-primary-100 text-center">
                 <div className="text-[10px] text-ink-muted font-semibold uppercase tracking-wider mb-1">
                   မင်းရဲ့ Code
                 </div>
@@ -148,42 +149,46 @@ export function MorePage() {
                   {profile?.pair_code ?? '------'}
                 </div>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
+              <button
+                type="button"
                 onClick={handleCopyCode}
-                className="!px-3 !py-3"
+                className="flex-shrink-0 w-12 h-12 rounded-xl bg-primary-soft text-primary-dark flex items-center justify-center active:scale-95 transition-all"
+                aria-label="Copy code"
               >
                 {copied ? (
                   <Check className="w-4 h-4" />
                 ) : (
                   <Copy className="w-4 h-4" />
                 )}
-              </Button>
+              </button>
             </div>
 
+            {/* Partner Code Input */}
             <div className="border-t border-slate-100 pt-4">
               <div className="text-[11px] font-semibold text-ink-muted mb-2 pl-1 uppercase tracking-wide">
                 ခလေးရဲ့ Code ထည့်ပါ
               </div>
-              <div className="flex gap-2">
+
+              <div className="flex gap-2 items-stretch">
                 <input
                   value={codeInput}
                   onChange={(e) => setCodeInput(e.target.value.toUpperCase())}
                   onKeyDown={(e) => e.key === 'Enter' && handlePair()}
                   placeholder="ABC123"
                   maxLength={6}
-                  className="flex-1 px-4 py-3 rounded-[14px] border-[1.5px] border-slate-200 bg-white text-center text-[16px] font-bold tracking-widest uppercase outline-none transition-all focus:border-primary focus:ring-4 focus:ring-primary/10 placeholder:text-slate-300 en"
+                  className="flex-1 min-w-0 px-3 py-3 rounded-[14px] border-[1.5px] border-slate-200 bg-white text-center text-[16px] font-bold tracking-widest uppercase outline-none transition-all focus:border-primary focus:ring-4 focus:ring-primary/10 placeholder:text-slate-300 en"
                 />
-                <Button
-                  size="sm"
+                <button
+                  type="button"
                   onClick={handlePair}
                   disabled={pairing}
-                  className="!px-4"
+                  className="flex-shrink-0 px-4 rounded-[14px] bg-gradient-to-br from-blue-500 to-blue-700 text-white font-semibold text-[12px] flex items-center gap-1.5 shadow-[0_4px_14px_-4px_rgba(37,99,235,0.6)] active:scale-[0.97] disabled:opacity-50 whitespace-nowrap"
                 >
                   <UserPlus className="w-4 h-4" />
-                </Button>
+                  <span>ချိတ်</span>
+                </button>
               </div>
+
               <div className="mt-2">
                 <Badge variant="gray">⏳ မချိတ်ဆက်ရသေး</Badge>
               </div>
@@ -220,7 +225,6 @@ export function MorePage() {
       <Card>
         <CardTitle icon="🔐">လုံခြုံရေး</CardTitle>
 
-        {/* Email display */}
         <div className="bg-slate-50 rounded-xl px-4 py-3 mb-3">
           <div className="text-[10px] text-ink-muted font-semibold uppercase tracking-wide mb-0.5">
             Email
@@ -330,9 +334,7 @@ function ChangePasswordModal({
             <div className="text-[15px] font-bold text-ink leading-tight">
               Password ပြောင်းမယ်
             </div>
-            <div className="text-[10px] text-ink-muted">
-              လုံခြုံရေးအတွက်
-            </div>
+            <div className="text-[10px] text-ink-muted">လုံခြုံရေးအတွက်</div>
           </div>
         </div>
         <button
@@ -355,7 +357,6 @@ function ChangePasswordModal({
         </div>
       ) : (
         <>
-          {/* Current Password */}
           <label className="block text-[11px] font-semibold text-ink-muted mb-1.5 pl-1 uppercase tracking-wide">
             လက်ရှိ Password
           </label>
@@ -383,7 +384,6 @@ function ChangePasswordModal({
             </button>
           </div>
 
-          {/* New Password */}
           <label className="block text-[11px] font-semibold text-ink-muted mb-1.5 pl-1 uppercase tracking-wide">
             Password အသစ်
           </label>
@@ -411,7 +411,6 @@ function ChangePasswordModal({
             </button>
           </div>
 
-          {/* Confirm */}
           <label className="block text-[11px] font-semibold text-ink-muted mb-1.5 pl-1 uppercase tracking-wide">
             Confirm Password
           </label>
