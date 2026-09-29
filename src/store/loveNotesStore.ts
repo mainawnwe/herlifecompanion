@@ -65,7 +65,7 @@ export const useLoveNotesStore = create<StoreState>((set, get) => ({
 
     try {
       const { data, error } = await supabase.rpc('send_love_note', {
-        note_content: clean,
+        p_content: clean,
       });
       if (error) {
         console.error('[loveNotes] send error:', error);
