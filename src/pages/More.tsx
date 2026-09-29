@@ -1,9 +1,19 @@
 import { useState, useEffect } from 'react';
-import { LogOut, Copy, Check, Heart, UserPlus } from 'lucide-react';
+import {
+  LogOut,
+  Copy,
+  Check,
+  UserPlus,
+  KeyRound,
+  Eye,
+  EyeOff,
+  X,
+} from 'lucide-react';
 import { Card, CardTitle } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
 import { Badge } from '@/components/common/Badge';
+import { Modal } from '@/components/common/Modal';
 import { TodoList } from '@/components/features/todo/TodoList';
 import { useProfileStore } from '@/store/profileStore';
 import { useAuthStore } from '@/store/authStore';
@@ -16,14 +26,23 @@ import { todayISO } from '@/lib/utils';
 export function MorePage() {
   const { profile, saveProfile, loading } = useProfileStore();
   const signOut = useAuthStore((s) => s.signOut);
-  const { partner, loadPartner, pairWithCode, unpair, loading: pairing } =
-    useCoupleStore();
+  const changePassword = useAuthStore((s) => s.changePassword);
+  const {
+    partner,
+    loadPartner,
+    pairWithCode,
+    unpair,
+    loading: pairing,
+  } = useCoupleStore();
 
   const [name, setName] = useState('');
   const [birthday, setBirthday] = useState('');
   const [partnerInput, setPartnerInput] = useState('');
   const [copied, setCopied] = useState(false);
   const [codeInput, setCodeInput] = useState('');
+
+  // Change Password Modal
+  const [pwOpen, setPwOpen] = useState(false);
 
   useEffect(() => {
     setName(profile?.display_name ?? '');
@@ -197,6 +216,32 @@ export function MorePage() {
         </Button>
       </Card>
 
+      {/* Security */}
+      <Card>
+        <CardTitle icon="🔐">လုံခြုံရေး</CardTitle>
+
+        {/* Email display */}
+        <div className="bg-slate-50 rounded-xl px-4 py-3 mb-3">
+          <div className="text-[10px] text-ink-muted font-semibold uppercase tracking-wide mb-0.5">
+            Email
+          </div>
+          <div className="text-[13px] font-semibold text-ink break-all">
+            {profile?.email ?? '—'}
+          </div>
+        </div>
+
+        <Button
+          variant="ghost"
+          fullWidth
+          onClick={() => setPwOpen(true)}
+          className="!justify-start"
+        >
+          <KeyRound className="w-4 h-4" />
+          <span className="flex-1 text-left">Password ပြောင်းမယ်</span>
+          <span className="text-ink-muted">›</span>
+        </Button>
+      </Card>
+
       {/* Sign Out */}
       <Card>
         <Button variant="danger" fullWidth onClick={handleSignOut}>
@@ -207,6 +252,199 @@ export function MorePage() {
       <div className="text-center text-ink-muted text-[11px] py-3 pb-6">
         Made with 💙 for {profile?.display_name ?? '—'}
       </div>
+
+      {/* Change Password Modal */}
+      <ChangePasswordModal
+        open={pwOpen}
+        onClose={() => setPwOpen(false)}
+        onSubmit={changePassword}
+      />
     </>
+  );
+}
+
+// ═══════════════════════════════════════════════════
+// Change Password Modal
+// ═══════════════════════════════════════════════════
+function ChangePasswordModal({
+  open,
+  onClose,
+  onSubmit,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onSubmit: (
+    current: string,
+    newPw: string
+  ) => Promise<{ error: string | null }>;
+}) {
+  const [current, setCurrent] = useState('');
+  const [next, setNext] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNext, setShowNext] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      setCurrent('');
+      setNext('');
+      setConfirm('');
+      setError(null);
+      setSuccess(false);
+      setShowCurrent(false);
+      setShowNext(false);
+    }
+  }, [open]);
+
+  const handle = async () => {
+    setError(null);
+
+    if (!current) return setError('လက်ရှိ Password ထည့်ပါ');
+    if (next.length < 6) return setError('Password အသစ် ၆ လုံး အနည်းဆုံး');
+    if (next !== confirm) return setError('Password ၂ ခု မတူဘူး');
+    if (current === next) return setError('Password အသစ်က အဟောင်းနဲ့ တူနေတယ်');
+
+    setLoading(true);
+    const res = await onSubmit(current, next);
+    setLoading(false);
+
+    if (res.error) {
+      setError(res.error);
+      return;
+    }
+    setSuccess(true);
+    setTimeout(() => onClose(), 1500);
+  };
+
+  return (
+    <Modal open={open} onClose={onClose}>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <div className="w-9 h-9 rounded-xl bg-primary-soft flex items-center justify-center">
+            <KeyRound className="w-4 h-4 text-primary" />
+          </div>
+          <div>
+            <div className="text-[15px] font-bold text-ink leading-tight">
+              Password ပြောင်းမယ်
+            </div>
+            <div className="text-[10px] text-ink-muted">
+              လုံခြုံရေးအတွက်
+            </div>
+          </div>
+        </div>
+        <button
+          onClick={onClose}
+          className="text-ink-muted hover:text-ink p-1 rounded-lg hover:bg-slate-100 transition-all"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+
+      {success ? (
+        <div className="text-center py-6">
+          <div className="text-[48px] mb-2">✅</div>
+          <div className="text-[15px] font-bold text-emerald-600 mb-1">
+            Password ပြောင်းပြီးပါပြီ
+          </div>
+          <div className="text-[12px] text-ink-muted">
+            အသစ်နဲ့ ပြန်ဝင်ရန် အသင့်ပါ
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Current Password */}
+          <label className="block text-[11px] font-semibold text-ink-muted mb-1.5 pl-1 uppercase tracking-wide">
+            လက်ရှိ Password
+          </label>
+          <div className="relative mb-3">
+            <input
+              type={showCurrent ? 'text' : 'password'}
+              value={current}
+              onChange={(e) => {
+                setCurrent(e.target.value);
+                setError(null);
+              }}
+              placeholder="••••••"
+              className="w-full px-4 py-3 pr-11 rounded-[14px] border-[1.5px] border-slate-200 bg-white text-ink text-sm outline-none transition-all focus:border-primary focus:ring-4 focus:ring-primary/10"
+            />
+            <button
+              type="button"
+              onClick={() => setShowCurrent((v) => !v)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
+            >
+              {showCurrent ? (
+                <EyeOff className="w-4 h-4" />
+              ) : (
+                <Eye className="w-4 h-4" />
+              )}
+            </button>
+          </div>
+
+          {/* New Password */}
+          <label className="block text-[11px] font-semibold text-ink-muted mb-1.5 pl-1 uppercase tracking-wide">
+            Password အသစ်
+          </label>
+          <div className="relative mb-3">
+            <input
+              type={showNext ? 'text' : 'password'}
+              value={next}
+              onChange={(e) => {
+                setNext(e.target.value);
+                setError(null);
+              }}
+              placeholder="၆ လုံး အနည်းဆုံး"
+              className="w-full px-4 py-3 pr-11 rounded-[14px] border-[1.5px] border-slate-200 bg-white text-ink text-sm outline-none transition-all focus:border-primary focus:ring-4 focus:ring-primary/10"
+            />
+            <button
+              type="button"
+              onClick={() => setShowNext((v) => !v)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
+            >
+              {showNext ? (
+                <EyeOff className="w-4 h-4" />
+              ) : (
+                <Eye className="w-4 h-4" />
+              )}
+            </button>
+          </div>
+
+          {/* Confirm */}
+          <label className="block text-[11px] font-semibold text-ink-muted mb-1.5 pl-1 uppercase tracking-wide">
+            Confirm Password
+          </label>
+          <div className="relative mb-3">
+            <input
+              type="password"
+              value={confirm}
+              onChange={(e) => {
+                setConfirm(e.target.value);
+                setError(null);
+              }}
+              onKeyDown={(e) => e.key === 'Enter' && handle()}
+              placeholder="Password ပြန်"
+              className="w-full px-4 py-3 rounded-[14px] border-[1.5px] border-slate-200 bg-white text-ink text-sm outline-none transition-all focus:border-primary focus:ring-4 focus:ring-primary/10"
+            />
+          </div>
+
+          {error && (
+            <div className="text-[12px] text-red-500 bg-red-50 rounded-xl px-3 py-2 mb-3">
+              {error}
+            </div>
+          )}
+
+          <div className="flex gap-2 mt-2">
+            <Button variant="ghost" fullWidth onClick={onClose}>
+              မလုပ်တော့
+            </Button>
+            <Button fullWidth onClick={handle} disabled={loading}>
+              {loading ? '...' : '🔒 သိမ်းမယ်'}
+            </Button>
+          </div>
+        </>
+      )}
+    </Modal>
   );
 }
