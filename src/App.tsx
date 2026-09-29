@@ -6,6 +6,8 @@ import { useCoupleStore } from '@/store/coupleStore';
 import { useJournalStore } from '@/store/journalStore';
 import { useTodoStore, useBucketStore, useDateStore } from '@/store/todoStore';
 import { useWaterStore, usePeriodStore } from '@/store/healthStore';
+import { useLoveNotesStore } from '@/store/loveNotesStore';
+import { supabase } from '@/lib/supabase';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { LoginPage } from '@/pages/Login';
 import { SetupPage } from '@/pages/Setup';
@@ -16,14 +18,22 @@ import { LovePage } from '@/pages/Love';
 import { MorePage } from '@/pages/More';
 
 export default function App() {
-  const { user, initialized, recoveryMode, updatePassword, exitRecovery, init } =
-    useAuthStore();
+  const {
+    user,
+    initialized,
+    recoveryMode,
+    updatePassword,
+    exitRecovery,
+    init,
+  } = useAuthStore();
   const { profile, loading, loadProfile } = useProfileStore();
 
+  // Auth init
   useEffect(() => {
     init();
   }, [init]);
 
+  // Load all data on login
   useEffect(() => {
     if (!user) return;
     (async () => {
@@ -37,9 +47,36 @@ export default function App() {
         usePeriodStore.getState().loadFromCloud(),
         useWaterStore.getState().loadFromCloud(),
       ]);
+      await useLoveNotesStore.getState().loadAll();
     })();
   }, [user, loadProfile]);
 
+  // Realtime subscription for love notes
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('love_notes_realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'love_notes',
+          filter: `to_user=eq.${user.id}`,
+        },
+        () => {
+          useLoveNotesStore.getState().loadAll();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
+
+  // Loading
   if (!initialized || (user && loading && !profile)) {
     return (
       <div className="min-h-screen flex items-center justify-center gradient-header">
@@ -56,10 +93,7 @@ export default function App() {
   // Password Recovery Mode
   if (recoveryMode) {
     return (
-      <ResetPasswordScreen
-        onUpdate={updatePassword}
-        onCancel={exitRecovery}
-      />
+      <ResetPasswordScreen onUpdate={updatePassword} onCancel={exitRecovery} />
     );
   }
 
