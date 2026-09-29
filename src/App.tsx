@@ -2,6 +2,9 @@ import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 import { useProfileStore } from '@/store/profileStore';
+import { useJournalStore } from '@/store/journalStore';
+import { useTodoStore, useBucketStore, useDateStore } from '@/store/todoStore';
+import { useWaterStore, usePeriodStore } from '@/store/healthStore';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { LoginPage } from '@/pages/Login';
 import { SetupPage } from '@/pages/Setup';
@@ -19,14 +22,23 @@ export default function App() {
     init();
   }, [init]);
 
-  // User ရှိလာရင် Profile load
+  // User login → Profile + Data အားလုံး Load
   useEffect(() => {
-    if (user) {
-      loadProfile();
-    }
+    if (!user) return;
+
+    (async () => {
+      await loadProfile();
+      await Promise.all([
+        useJournalStore.getState().loadFromCloud(),
+        useTodoStore.getState().loadFromCloud(),
+        useBucketStore.getState().loadFromCloud(),
+        useDateStore.getState().loadFromCloud(),
+        usePeriodStore.getState().loadFromCloud(),
+        useWaterStore.getState().loadFromCloud(),
+      ]);
+    })();
   }, [user, loadProfile]);
 
-  // Loading
   if (!initialized || (user && loading && !profile)) {
     return (
       <div className="min-h-screen flex items-center justify-center gradient-header">

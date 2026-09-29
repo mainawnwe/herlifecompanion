@@ -7,6 +7,10 @@ import { Badge } from '@/components/common/Badge';
 import { TodoList } from '@/components/features/todo/TodoList';
 import { useProfileStore } from '@/store/profileStore';
 import { useAuthStore } from '@/store/authStore';
+import { useJournalStore } from '@/store/journalStore';
+import { useTodoStore, useBucketStore, useDateStore } from '@/store/todoStore';
+import { usePeriodStore, useWaterStore } from '@/store/healthStore';
+import { todayISO } from '@/lib/utils';
 
 export function MorePage() {
   const { profile, saveProfile, loading } = useProfileStore();
@@ -51,8 +55,16 @@ export function MorePage() {
     }
   };
 
-  const handleSignOut = async () => {
+    const handleSignOut = async () => {
     if (!confirm('ထွက်မှာလား?')) return;
+    // Local store clear
+    useProfileStore.getState().clear();
+    useJournalStore.setState({ entries: [], loaded: false });
+    useTodoStore.setState({ todos: [] });
+    useBucketStore.setState({ items: [] });
+    useDateStore.setState({ dates: [] });
+    usePeriodStore.setState({ records: [] });
+    useWaterStore.setState({ date: todayISO(), count: 0, loaded: false });
     await signOut();
   };
 
